@@ -15,7 +15,8 @@ class User(AbstractUser):
     phone = models.CharField(max_length = 20,null = True)
 
     def __str__(self):
-        return self.username
+        ret=self.username + str(self.date_of_birth)
+        return ret
 
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
