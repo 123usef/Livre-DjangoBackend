@@ -19,3 +19,6 @@ def showbook(request ,id):
     book = Book.objects.get(id=id)
     seri = bookserializer(book , many=False)
     return Response(seri.data)
+
+
+
