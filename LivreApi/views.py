@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from .serilizer import *
 from .models import *
 
+#Livre_Project_Views
 
 #Register_A_New_User
 @api_view(['POST'])
@@ -24,13 +25,16 @@ def registration_view(request):
 			data = serializer.errors
 		return Response(data)
 
-#View_(Logged in)Main_User_Profile
+
+############
+# User Profile 
+
+#Show_(Logged in)Main_User_Profile
 @api_view()
 def profile(request):
     user = request.user
     main_user_serializer = MainUserSerializer(user, many=False)
     return Response(main_user_serializer.data)
-
 
 #Edit_(Logged in)Main_User_Profile
 @api_view(['POST'])
@@ -41,14 +45,16 @@ def manage_profile(request):
         update_user.save()
     return Response(update_user.data)
 
-
-#View_Any_User_Profile
+#Show_Other_User_Profile
 @api_view(['GET'])
 def others_profile(request, id):
     user = User.objects.get(id = id)
     other_user_serializer = OtherUserSerializer(user, many=False)
     return Response(other_user_serializer.data)
 
+
+############   
+#Messages
 
 #View_Main_User_Messages
 @api_view(['GET'])
@@ -58,7 +64,7 @@ def messages(request):
     all_my_messages = MessageSerializer(messages, many=True)
     return Response(all_my_messages.data)
 
-#Sending_Messages
+#Sending_Message
 @api_view(['POST'])
 def message(request, id):
     sender = request.user
@@ -67,6 +73,8 @@ def message(request, id):
     sent_message=MessageSerializer(message, many=False)
     return Response(sent_message.data)
 
+############    
+#Books
 
 #Add_Book
 @api_view(['POST'])
@@ -78,7 +86,7 @@ def add_book(request):
     add_book = BookSerializer(book, many=False)
     return Response(add_book.data)
 
-#View_Main_User_Book
+#Show_Main_User_Books
 @api_view(['GET'])
 def show_main_user_books(request):
     user = request.user
@@ -86,7 +94,7 @@ def show_main_user_books(request):
     user_books = BookSerializer(books , many=True)
     return Response(user_books.data)
 
-#View_Main_User_Book
+#Show_Other_User_Books
 @api_view(['GET'])
 def show_other_user_books(request, id):
     user = User.objects.get(id=id)
@@ -94,6 +102,9 @@ def show_other_user_books(request, id):
     user_books = BookSerializer(books , many=True)
     return Response(user_books.data)
 
+
+############    
+#Transactions
 
 # Excahnge_Book
 @api_view(['POST'])
@@ -104,7 +115,6 @@ def exchange_book (request,bookid):
     exchange_transaction = TransactionSerializer(transaction, many=False)
     return Response(exchange_transaction.data)
 
-
 # Accept_Excahnging_Book
 @api_view(['POST'])
 def accept_exchange(request,exchangeid):
@@ -114,7 +124,6 @@ def accept_exchange(request,exchangeid):
     transaction.save()    
     accept_transaction = TransactionSerializer(transaction, many=False)
     return Response(accept_transaction.data)
-
 
 # Decline_Excahnging_Book
 @api_view(['POST'])
@@ -127,20 +136,19 @@ def decline_exchange(request,exchangeid):
 
 #View_Main_User_Sent_Transactions
 @api_view(['GET'])
-def view_sender_transaction (request):
+def show_sender_transaction (request):
     user = request.user
     transaction = Transaction.objects.filter(tr_sender=user)
-    view_sender_transaction = TransactionSerializer(transaction, many=True)
-    return Response(view_sender_transaction.data)
-
+    show_sender_transaction = TransactionSerializer(transaction, many=True)
+    return Response(show_sender_transaction.data)
 
 #View_Main_User_Recived_Transactions
 @api_view(['GET'])
-def view_reciver_transaction (request):
+def show_reciver_transaction (request):
     user = request.user
     transaction = Transaction.objects.filter(tr_receiver=user)
-    view_reciver_transaction = TransactionSerializer(transaction, many=True)
-    return Response(view_reciver_transaction.data)
+    show_reciver_transaction = TransactionSerializer(transaction, many=True)
+    return Response(show_reciver_transaction.data)
 
 
 
@@ -156,25 +164,3 @@ def view_reciver_transaction (request):
 #  }
 
      
-
-
-# Create your views here.
-
-
-# @api_view()
-# def showbooks(request):
-#     books = Book.objects.all()
-#     seri = BookSerializer(books , many=True)
-#     return Response(seri.data)
-   
-# @api_view()
-# def showbook(request ,id):
-#     book = Book.objects.get(id=id)
-#     seri = BookSerializer(book , many=False)
-#     return Response(seri.data)
-
-# @api_view()
-# def show_user_books
-
-# @api_view()
-# def show_others_books
