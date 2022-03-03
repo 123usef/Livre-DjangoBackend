@@ -173,8 +173,3 @@ def view_reciver_transaction (request):
 #     seri = BookSerializer(book , many=False)
 #     return Response(seri.data)
 
-# @api_view()
-# def show_user_books
-
-# @api_view()
-# def show_others_books
