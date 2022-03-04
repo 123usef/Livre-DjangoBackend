@@ -13,12 +13,17 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null = True)
     location = models.CharField(max_length = 200,null = True)
     phone = models.CharField(max_length = 20,null = True)
+    email = models.EmailField(verbose_name = 'email',max_length=50, unique=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     def __str__(self):
         return self.username
 
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
+    # book = models.ForeignKey(Book, on_delete= models.CASCADE)
     def __str__(self):
         return self.name
 
@@ -26,7 +31,7 @@ class Subscription(models.Model):
     cat = models.ForeignKey(Category, on_delete= models.CASCADE)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     def __str__(self):
-        return self.cat
+        return str(self.cat_id)
   
 class Book(models.Model):
     title=models.CharField(max_length=50, null=True)
