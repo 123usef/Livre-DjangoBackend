@@ -18,7 +18,6 @@ class User(AbstractUser):
     date_of_birth = models.DateField(null = True)
     location = models.CharField(max_length = 200,null = True)
     phone = models.CharField(max_length = 20,null = True)
-    
     email = models.EmailField(verbose_name = 'email',max_length=50, unique=True)
 
     USERNAME_FIELD = 'email'

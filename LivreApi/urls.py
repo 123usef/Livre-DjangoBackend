@@ -2,12 +2,15 @@ from django import views
 from django.urls import path
 from . import views
 from django.contrib import admin
-from rest_framework.authtoken.views import obtain_auth_token
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+)
 
 urlpatterns = [
-    path('api/register' , views.register , name='register'),
-    path('api/login' , obtain_auth_token , name='login'),
 
     path('api/books' , views.showbooks , name='books'),
     path('api/books/<int:id>' , views.showbook , name='book'),
+    # path('api/book/list' , views.BookListView , name='search'),
+    path('api/register' , views.registration_view , name='register'),
+    path('api/login', TokenObtainPairView.as_view(), name='login'),
 ]
