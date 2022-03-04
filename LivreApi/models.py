@@ -20,11 +20,13 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return self.username
+        ret=self.username + str(self.date_of_birth)
+        return ret
 
 #Category_Model
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
+    # book = models.ForeignKey(Book, on_delete= models.CASCADE)
     def __str__(self):
         return self.name
 

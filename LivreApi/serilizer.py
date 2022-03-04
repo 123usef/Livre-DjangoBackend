@@ -48,6 +48,29 @@ class RegistrationSerializer(serializers.ModelSerializer):
 		return user
 
 
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+        
+   
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+        
+#seri_sub
+class UnSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+        
+class UserSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields =' __all__'              
+        
+       
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
