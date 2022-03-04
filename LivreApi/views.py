@@ -8,9 +8,21 @@ from rest_framework.response import Response
 from .serilizer import *
 from .models import *
 
-#Livre_Project_Views
+#book
+@api_view()
+def showbooks(request):
+    books = Book.objects.all()
+    seri = BookSerializer(books , many=True)
+    return Response(seri.data)
+   
+@api_view()
+def showbook(request ,id):
+    book = Book.objects.get(id=id)
+    seri = BookSerializer(book , many=False)
+    return Response(seri.data)
 
-#Register_A_New_User
+
+#registeration
 @api_view(['POST'])
 def registration_view(request):
 	if request.method == 'POST':
@@ -24,6 +36,61 @@ def registration_view(request):
 		else:
 			data = serializer.errors
 		return Response(data)
+    
+#category 
+#all category 
+@api_view(['GET'])
+def categorys_view(request):
+    cat = Category.objects.all()
+    categorys = CategorySerializer(cat, many =True)
+    if request.user.is_authenticated:
+        subsc = User.subscription_set.all()
+    return Response(categorys.data)
+
+#category page
+@api_view()
+def category_view(request ,id):
+    cat = Category.objects.get(id=id)
+    category = CategorySerializer(cat , many=False)
+    return Response(category.data)
+
+#subscription
+@api_view(['GET'])
+def user_subscription_view(request ,id):
+    cat = Category.objects.all()
+    user = request.user
+    subsc = user.Subscription_set.all()
+    subsc_seri = UserSubscriptionSerializer(subsc, many=False, instance=user)
+    subsc_id = []
+    for subs in subsc:
+        subsc_id.append(subs.cat_id)
+    if len(subsc) == 0:
+        books = Book.object.all()
+    else:
+        books = Book.object.filter(cat_id=subsc_id)
+    return  Response(subsc_seri.data)       
+        
+    
+
+@api_view(['GET'])
+def subscription_view(request, id):
+    category = Category.objects.get(id=id)
+    # user_id = request.user.id
+    subscribe = Subscription.objects.create(user=request.user, cat=category)
+    subscribe_seri = SubscriptionSerializer(subscribe, many=False)
+    return Response(subscribe_seri.data) 
+    
+
+@api_view(['GET'])  
+def unsubscription_view(request, id):
+    user = request.user
+    category = Category.objects.get(id=id)
+    subscribe = Subscription.objects.filter(user=request.user, cat=category).first()
+    subscribe.delete()
+    # unsubscribe_seri = UnSubscriptionSerializer(unsubscribe, many=False)
+    return Response({"message":"you unsubscribed this category now"})
+
+    # {
 
 
 ############
@@ -192,6 +259,16 @@ def admin_operation(request , option , id=0):
             if cat_ser.is_valid():
                 cat_ser.save()
             return Response(cat_ser.data)
+        elif option == "block_user":
+            user = User.objects.get(id = id)
+            user.is_blocked = 'True'
+            user.save()
+            return Response(f"user with id : {id} is blocked successfully ")
+        elif option == "unblock_user":
+            user = User.objects.get(id = id)
+            user.is_blocked = 'False'
+            user.save()
+            return Response(f"user with id : {id} is unblocked successfully ")    
         else : 
             return Response("wrong parameter")    
     elif request.method == "DELETE":
@@ -226,5 +303,3 @@ def admin_operation(request , option , id=0):
 #  "location" : "cairo",
 #  "phone" : "01272639811"
 #  }
-
-     
