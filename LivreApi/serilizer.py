@@ -59,3 +59,28 @@ class RegistrationSerializer(serializers.ModelSerializer):
 		user.set_password(password)
 		user.save()
 		return user
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = '__all__'
+        
+   
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+        
+#seri_sub
+class UnSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = '__all__'
+        
+class UserSubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields =' __all__'              
+        
+       
