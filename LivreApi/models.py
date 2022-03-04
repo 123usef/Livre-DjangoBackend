@@ -1,13 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
+#Livre_Project_Models
 
-# Create your models here.
-
+#User_Model
 class User(AbstractUser):
    
     is_blocked = models.BooleanField(default=False , null = True)
@@ -26,41 +22,42 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        Token.objects.create(user=instance)
-
-
+#Category_Model
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
     # book = models.ForeignKey(Book, on_delete= models.CASCADE)
     def __str__(self):
         return self.name
 
+#Subscription_Model
 class Subscription(models.Model):
     cat = models.ForeignKey(Category, on_delete= models.CASCADE)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     def __str__(self):
-        return str(self.cat_id)
-  
+        return self.cat
+
+#Book_Model
 class Book(models.Model):
     title=models.CharField(max_length=50, null=True)
     author=models.CharField(max_length=50,null=True)
     description = models.TextField(null=True)
+    book_status = (("exchange", "exchange"), ("donate", "donate"))
+    status = models.CharField(max_length= 20, choices=book_status,null = True)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     cat = models.ForeignKey(Category, on_delete= models.CASCADE)
     def __str__(self):
         return self.title
 
+#Transaction_Model
 class Transaction(models.Model):
-    type = models.CharField(max_length=50,null=True)
+    is_accepted = models.BooleanField(default=False,null=True)
+    book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     tr_sender = models.ForeignKey(User,related_name ="tr_sender", on_delete= models.CASCADE)
     tr_receiver = models.ForeignKey(User,related_name="tr_receiver", on_delete= models.CASCADE)
     def __str__(self):
-        return self.type
+        return self.book.title
 
+#Message_Model
 class Message(models.Model):
     content = models.CharField(max_length=250,null= True)
     m_sender = models.ForeignKey(User,related_name ="m_sender", on_delete= models.CASCADE)
@@ -68,6 +65,7 @@ class Message(models.Model):
     def __str__(self):
         return self.content
 
+#Rate_Model
 class Rate(models.Model):
     rate = models.IntegerField(null=True)
     r_sender = models.ForeignKey(User,related_name ="r_sender", on_delete= models.CASCADE)

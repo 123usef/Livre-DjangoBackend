@@ -1,5 +1,4 @@
-# from dataclasses import field
-# import email
+from dataclasses import fields
 from rest_framework import serializers
 from .models import *
 from rest_framework.validators import UniqueValidator
@@ -20,15 +19,20 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user  
        
 
-class bookserializer(serializers.ModelSerializer):
-    class Meta:
-        model = Book
-        fields = '__all__'
-class Userserializer(serializers.ModelSerializer):
+class MainUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
 
+class OtherUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','email','gender','date_of_birth','location']
+
+class BookSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = '__all__'
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
@@ -84,3 +88,12 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         fields =' __all__'              
         
        
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'   
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
