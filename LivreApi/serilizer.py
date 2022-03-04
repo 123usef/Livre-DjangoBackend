@@ -1,30 +1,21 @@
+from dataclasses import fields
 from rest_framework import serializers
 from .models import *
 
-
-
-# Registration serializer getting cooked for view
-class RegistrationSerialzer(serializers.ModelSerializer):
-
+class MainUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['username','email','user_gender','date_of_birth','phone','location','password']
-        extra_kwargs = {
-                    'password1':{'write_only':True},
-                    'password2':{'write_only':True}
-        }
+        fields = '__all__'
 
+class OtherUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','email','gender','date_of_birth','location']
 
-
-class bookserializer(serializers.ModelSerializer):
+class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = '__all__'
-class Userserializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = '__all__'
-
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
@@ -55,3 +46,20 @@ class RegistrationSerializer(serializers.ModelSerializer):
 		user.set_password(password)
 		user.save()
 		return user
+
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = '__all__'   
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta :
+        model = Category
+        fields = '__all__'
