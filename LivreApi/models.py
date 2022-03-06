@@ -42,6 +42,7 @@ class Book(models.Model):
     description = models.TextField(null=True)
     book_status = (("exchange", "exchange"), ("donate", "donate"))
     status = models.CharField(max_length= 20, choices=book_status,null = True)
+    date_creation = models.DateTimeField(auto_now_add=True , null = True)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     cat = models.ForeignKey(Category, on_delete= models.CASCADE)
     def __str__(self):
@@ -66,7 +67,8 @@ class Message(models.Model):
 
 #Rate_Model
 class Rate(models.Model):
-    rate = models.IntegerField(null=True)
+    user_rate = (("one", 1), ("two", 2),("three",3),("four",4),("five",5))
+    rate = models.CharField(max_length= 10, choices=user_rate,null = True)
     r_sender = models.ForeignKey(User,related_name ="r_sender", on_delete= models.CASCADE)
     r_receiver = models.ForeignKey(User,related_name="r_receiver", on_delete= models.CASCADE)      
     def __str__(self):
