@@ -15,6 +15,7 @@ urlpatterns = [
    
     #category
     path('api/categorys', views.categorys_view, name='categorys'),
+    path('api/categories', views.categories, name='categories'),
     path('api/category/<int:id>', views.category_view, name='category'),
     path('api/subscription/<int:id>', views.subscription_view, name='subscription'),
     path('api/unsubscription/<int:id>', views.unsubscription_view, name='unsubscription'),
