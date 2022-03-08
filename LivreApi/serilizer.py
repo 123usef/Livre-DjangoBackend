@@ -79,6 +79,8 @@ class MessageSerializer(serializers.ModelSerializer):
 #transactions
 class TransactionSerializer(serializers.ModelSerializer):
     book = BookSerializer(many=False)
+    tr_sender = OtherUserSerializer(many=False)
+    tr_receiver = OtherUserSerializer(many=False)
     class Meta:
         model = Transaction
         fields = '__all__'
