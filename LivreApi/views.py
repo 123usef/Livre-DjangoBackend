@@ -282,12 +282,12 @@ def admin_operation(request, option, id=0):
             user = User.objects.get(id=id)
             user.is_blocked = 'True'
             user.save()
-            return Response(f"user with id : {id} is blocked successfully ")
+            return Response(user.is_blocked)
         elif option == "unblock_user":
             user = User.objects.get(id=id)
             user.is_blocked = 'False'
             user.save()
-            return Response(f"user with id : {id} is unblocked successfully ")
+            return Response(user.is_blocked)
         else:
             return Response("wrong parameter")
     elif request.method == "DELETE":
