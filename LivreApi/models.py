@@ -67,7 +67,7 @@ class Message(models.Model):
 
 #Rate_Model
 class Rate(models.Model):
-    user_rate = (("one", 1), ("two", 2),("three",3),("four",4),("five",5))
+    user_rate = (("1", 1), ("2", 2),("3",3),("4",4),("5",5))
     rate = models.CharField(max_length= 10, choices=user_rate,null = True)
     r_sender = models.ForeignKey(User,related_name ="r_sender", on_delete= models.CASCADE)
     r_receiver = models.ForeignKey(User,related_name="r_receiver", on_delete= models.CASCADE)      

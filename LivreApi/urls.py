@@ -13,9 +13,11 @@ urlpatterns = [
     path('api/books' , views.showbooks , name='books'),
     path('api/search' , views.search , name='search'),
     path('api/books/<int:id>' , views.showbook , name='book'),
+     path('api/userbooks/<int:id>' , views.userbooks , name='userbooks'),
    
     #category
     path('api/categorys', views.categorys_view, name='categorys'),
+    path('api/categories', views.categories, name='categories'),
     path('api/category/<int:id>', views.category_view, name='category'),
     path('api/subscription/<int:id>', views.subscription_view, name='subscription'),
     path('api/unsubscription/<int:id>', views.unsubscription_view, name='unsubscription'),
@@ -44,6 +46,7 @@ urlpatterns = [
        path('api/messages/' , views.messages , name='messages'),
     #Sending_Message
         path('api/message/<int:id>' , views.message , name='message'),
+        path('api/delmessage/<int:id>' , views.delmessage , name='delmessage'),
 
 
 ############    
