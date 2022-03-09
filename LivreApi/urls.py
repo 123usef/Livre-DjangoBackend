@@ -2,7 +2,7 @@ from django import views
 from django.urls import path
 from . import views
 from django.contrib import admin
-from .views import Search
+from .views import Createbook, Search
 # from rest_framework import routers #router
 
 from rest_framework_simplejwt.views import (
@@ -11,19 +11,22 @@ from rest_framework_simplejwt.views import (
 urlpatterns = [
 
     path('api/books' , views.showbooks , name='books'),
+    path('api/search' , views.search , name='search'),
     path('api/books/<int:id>' , views.showbook , name='book'),
+     path('api/userbooks/<int:id>' , views.userbooks , name='userbooks'),
    
     #category
     path('api/categorys', views.categorys_view, name='categorys'),
+    path('api/categories', views.categories, name='categories'),
     path('api/category/<int:id>', views.category_view, name='category'),
     path('api/subscription/<int:id>', views.subscription_view, name='subscription'),
     path('api/unsubscription/<int:id>', views.unsubscription_view, name='unsubscription'),
-    path('api/user_subscription/<int:id>', views.user_subscription_view, name='user_subscription'),
+    path('api/user_subscription', views.user_subscription_view, name='user_subscription'),
     path('api/add_book/' , views.add_book , name='add_book'),
-
+    path('api/listcat' , views.listcat , name = 'listcat'),
 # Login & Register
     #Register_A_New_User
-        path('api/register' , views.registration_view , name='register'),
+        path('api/register' , views.registration_view.as_view() , name='register'),
     # Login  
         path('api/login', TokenObtainPairView.as_view(), name='login'),
 
@@ -43,6 +46,7 @@ urlpatterns = [
        path('api/messages/' , views.messages , name='messages'),
     #Sending_Message
         path('api/message/<int:id>' , views.message , name='message'),
+        path('api/delmessage/<int:id>' , views.delmessage , name='message'),
 
 
 ############    
@@ -78,5 +82,7 @@ urlpatterns = [
         path('api/search' ,Search.as_view(), name = 'search'),
     #Rate
         path('api/rate/<int:id>' ,views.rate, name='rate'),
-        path('api/show_rate/<int:id>' ,views.show_rate, name='show_rate'),       
+        path('api/show_rate/<int:id>' ,views.show_rate, name='show_rate'),
+        
+        path('api/createbook/', Createbook.as_view(), name='createbook')
 ]
