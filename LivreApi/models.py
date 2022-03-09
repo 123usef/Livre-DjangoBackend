@@ -2,13 +2,18 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 #Livre_Project_Models
+def upload_to(instance, filename):
+    return 'book/{filename}'.format(filename=filename)
+def upload_toprofile(instance, filename):
+    return 'profile/{filename}'.format(filename=filename)
+
 
 #User_Model
 class User(AbstractUser):
    
     is_blocked = models.BooleanField(default=False , null = True)
     is_admin = models.BooleanField(default=False , null = True)
-    
+    image = models.ImageField(upload_to=upload_toprofile , default='profile/def.jpg' )
     user_gender = (("male", "male"), ("female", "female"))
     gender = models.CharField(max_length= 6, choices=user_gender,null = True)
     date_of_birth = models.DateField(null = True)
@@ -38,7 +43,8 @@ class Subscription(models.Model):
 #Book_Model
 class Book(models.Model):
     title=models.CharField(max_length=50, null=True)
-    author=models.CharField(max_length=50,null=True)
+    author=models.CharField(max_length=50,null=True )
+    image = models.ImageField(upload_to=upload_to, null=True , default='book/default-book.png')
     description = models.TextField(null=True)
     book_status = (("exchange", "exchange"), ("donate", "donate"))
     status = models.CharField(max_length= 20, choices=book_status,null = True)

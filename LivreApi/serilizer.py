@@ -1,4 +1,3 @@
-from dataclasses import fields
 from rest_framework import serializers
 from .models import *
 from rest_framework.validators import UniqueValidator
@@ -27,21 +26,24 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'password2',
-                  'gender', 'date_of_birth', 'location', 'phone']
+                  'gender', 'date_of_birth', 'location', 'phone','image']
         extra_kwargs = {
             'password': {'write_only': True},
         }
-
+         
+        
     def save(self):
-
+        
         user = User(
-            email=self.validated_data['email'],
-            username=self.validated_data['username'],
-            gender=self.validated_data['gender'],
-            date_of_birth=self.validated_data['date_of_birth'],
-            location=self.validated_data['location'],
-            phone=self.validated_data['phone'],
-        )
+                email=self.validated_data['email'],
+                username=self.validated_data['username'],
+                gender=self.validated_data['gender'],
+                date_of_birth=self.validated_data['date_of_birth'],
+                location=self.validated_data['location'],
+                phone=self.validated_data['phone'],
+                image=self.validated_data['image'],
+            )
+
         password = self.validated_data['password']
         password2 = self.validated_data['password2']
         if password != password2:
