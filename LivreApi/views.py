@@ -1,3 +1,12 @@
+# #for image 
+from rest_framework import viewsets, filters, generics, permissions
+# from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
+from rest_framework.views import APIView
+
+# ##
+
 from pickle import GET
 from unicodedata import category
 from urllib import response
@@ -15,35 +24,67 @@ from rest_framework.authtoken.models import Token
 # Create your views here.
 
 # book
+
+
 @api_view()
 def showbooks(request):
-    books = Book.objects.all()
+    books = Book.objects.all().order_by("-id")
     seri = BookSerializer(books, many=True)
     return Response(seri.data)
+
+@api_view(['GET'])
+def userbooks(request , id):
+    user = User.objects.get(id=id)
+    books = Book.objects.filter(user=user).order_by("-id")
+    seri = BookSerializer(books, many=True)
+    return Response(seri.data)
+
 
 @api_view()
 def showbook(request, id):
     book = Book.objects.get(id=id)
     seri = BookSerializer(book, many=False)
     return Response(seri.data)
+@api_view()
+def search(request):
+		q = request.GET.name
+		book = Book.objects.filter(title__contains = q )
+		seri = BookSerializer(book , many=False)
+		return Response(seri.data)
 
 # registeration
-@api_view(['POST'])
-def registration_view(request):
-    if request.method == 'POST':
-        serializer = RegistrationSerializer(data=request.data)
-        data = {}
-        if serializer.is_valid():
-            user = serializer.save()
-            data['response'] = 'successfully registered new user.'
-            data['email'] = user.email
-            data['username'] = user.username
-        else:
-            data = serializer.errors
-        return Response(data)
+class registration_view(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, format=None):
+        data = request.data
+        img = request.data.get('image', 'profile/def.jpg')
+        user = User.objects.create(username=data['username'], email=data['email'],
+        gender=data['gender'], date_of_birth=data['date_of_birth'], location=data['location'], phone=data['phone'], image=img)
+        user.set_password(data['password'])
+        user.save()
+        return Response({'good'}, status=status.HTTP_200_OK)
+    
+
+
+# @api_view(['POST'])
+# def registration_view(request):
+#     if request.method == 'POST':
+#         serializer = RegistrationSerializer(data=request.data)
+#         data = {}
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             data['response'] = 'successfully registered new user.'
+#             data['email'] = user.email
+#             data['username'] = user.username
+#         else:
+#             data = serializer.errors
+#         return Response(data)
 
 # category
 # all category
+
+
 @api_view(['GET'])
 def categorys_view(request):
     cat = Category.objects.all()
@@ -52,7 +93,16 @@ def categorys_view(request):
         subsc = User.subscription_set.all()
     return Response(categorys.data)
 
+
+@api_view(['GET'])
+def categories(request):
+    cat = Category.objects.all()
+    categories = CategorySerializer(cat, many=True)
+    return Response(categories.data)
+
 # category page
+
+
 @api_view()
 def category_view(request, id):
     cat = Category.objects.get(id=id)
@@ -60,6 +110,8 @@ def category_view(request, id):
     return Response(category.data)
 
 # subscription
+
+
 @api_view(['GET'])
 def user_subscription_view(request):
     cat = Category.objects.all()
@@ -67,6 +119,7 @@ def user_subscription_view(request):
     subsc = user.subscription_set.all()
     subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
     return Response(subsc_seri.data)
+
 
 @api_view(['GET'])
 def listcat(request):
@@ -82,6 +135,7 @@ def subscription_view(request, id):
     subscribe_seri = SubscriptionSerializer(subscribe, many=False)
     return Response(subscribe_seri.data)
 
+
 @api_view(['GET'])
 def unsubscription_view(request, id):
     user = request.user
@@ -93,6 +147,8 @@ def unsubscription_view(request, id):
 
 # User Profile
 # Show_(Logged in)Main_User_Profile
+
+
 @api_view()
 def profile(request):
     user = request.user
@@ -100,6 +156,8 @@ def profile(request):
     return Response(main_user_serializer.data)
 
 # Edit_(Logged in)Main_User_Profile
+
+
 @api_view(['POST'])
 def manage_profile(request):
     user = request.user
@@ -109,6 +167,8 @@ def manage_profile(request):
     return Response(update_user.data)
 
 # Show_Other_User_Profile
+
+
 @api_view(['GET'])
 def others_profile(request, id):
     user = User.objects.get(id=id)
@@ -117,6 +177,8 @@ def others_profile(request, id):
 
 # Messages
 # View_Main_User_Messages
+
+
 @api_view(['GET'])
 def messages(request):
     user = request.user
@@ -125,6 +187,12 @@ def messages(request):
     return Response(all_my_messages.data)
 
 # Sending_Message
+
+@api_view(['POST'])
+def delmessage(request, id):
+    message = Message.objects.get(id=id)
+    message.delete()
+    return Response({'message deleted succefully'})
 @api_view(['POST'])
 def message(request, id):
     sender = request.user
@@ -136,17 +204,38 @@ def message(request, id):
 
 # Books
 # Add_Book
+class Createbook(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser ]
+    def post(self, request, format=None):
+        user = request.user
+        data = request.data
+        img = request.data.get('image', 'book/default-book.png')
+        category = Category.objects.get(id=data['cat'])
+        book = Book.objects.create(title=data['title'], author=data['author'],
+                                description=data['description'], status=data['status'], user=user, cat=category , image=img)
+        add_book = BookSerializer(book, many=False)
+
+        
+        # serializer = BookSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        return Response(add_book.data, status=status.HTTP_200_OK)
+        
+
 @api_view(['POST'])
 def add_book(request):
     user = request.user
     data = request.data
-    category = Category.objects.filter(name=data['cat']).first()
+    category = Category.objects.get(id=data['cat'])
     book = Book.objects.create(title=data['title'], author=data['author'],
                                description=data['description'], status=data['status'], user=user, cat=category)
     add_book = BookSerializer(book, many=False)
     return Response(add_book.data)
 
 # Show_Main_User_Books
+
+
 @api_view(['GET'])
 def show_main_user_books(request):
     user = request.user
@@ -155,6 +244,8 @@ def show_main_user_books(request):
     return Response(user_books.data)
 
 # Show_Other_User_Books
+
+
 @api_view(['GET'])
 def show_other_user_books(request, id):
     user = User.objects.get(id=id)
@@ -164,6 +255,8 @@ def show_other_user_books(request, id):
 
 # Transactions
 # Excahnge_Book
+
+
 @api_view(['POST'])
 def exchange_book(request, bookid):
     user = request.user
@@ -174,6 +267,8 @@ def exchange_book(request, bookid):
     return Response(exchange_transaction.data)
 
 # Accept_Excahnging_Book
+
+
 @api_view(['POST'])
 def accept_exchange(request, exchangeid):
     user = request.user
@@ -184,6 +279,8 @@ def accept_exchange(request, exchangeid):
     return Response(accept_transaction.data)
 
 # Decline_Excahnging_Book
+
+
 @api_view(['POST'])
 def decline_exchange(request, exchangeid):
     user = request.user
@@ -192,6 +289,8 @@ def decline_exchange(request, exchangeid):
     return Response({"message": "transaction has been declined"})
 
 # View_Main_User_Sent_Transactions
+
+
 @api_view(['GET'])
 def show_sender_transaction(request):
     user = request.user
@@ -207,33 +306,39 @@ def show_reciver_transaction(request):
     show_reciver_transaction = TransactionSerializer(transaction, many=True)
     return Response(show_reciver_transaction.data)
 
-#Rate
+# Rate
 @api_view(['POST'])
 def rate(request, id):
     sender = request.user
     receiver = User.objects.get(id=id)
     data = request.data
-    rate=Rate.objects.create(rate = data['rate'] ,r_receiver = receiver ,r_sender=sender)
+    rate = Rate.objects.create(
+        rate=data['rate'], r_receiver=receiver, r_sender=sender)
     rate_serializer = RateSerializer(rate, many=False)
     return Response(rate_serializer.data)
 
+
 @api_view(['GET'])
-def show_rate(request,id):
+def show_rate(request, id):
     user_get = User.objects.get(id=id)
-    user_rate = Rate.objects.filter(r_receiver = user_get )
+    user_rate = Rate.objects.filter(r_receiver=user_get)
     total = 0
-    sum=0
+    sum = 0
     for rate in user_rate:
-        sum += float(rate.rate)  
+        sum += float(rate.rate)
     total = sum / len(user_rate)
+    total = round(total , 2)
     return Response(str(total))
 
 #search and order
+
+
 class Search(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [filters.SearchFilter, OrderingFilter]
-    search_fields = ['title', 'author', 'status','description', 'cat__name', 'user__location']
+    search_fields = ['title', 'author', 'status',
+                     'description', 'cat__name', 'user__location']
 
 # admin section starts from here
 # --------------------------------
@@ -243,6 +348,7 @@ class Search(generics.ListAPIView):
     # list books ==>books serializer ,
     # listing category ===category serializere
 
+
 @api_view(['GET'])
 def admin_listing(request, option):
     if option == 'list_users':
@@ -251,7 +357,7 @@ def admin_listing(request, option):
         return Response(user_list.data)
     elif option == 'list_books':
         books = Book.objects.all()
-        books_list = BookSerializer(books, many=True)
+        books_list = AdminBookSerializer(books, many=True)
         return Response(books_list.data)
     elif option == 'list_category':
         cats = Category.objects.all()
@@ -262,6 +368,7 @@ def admin_listing(request, option):
 # listing for admin ends
 # add & delete operation for admin merged in one function
 # category==> (add ,update,delete), book ==> delete book
+
 
 @api_view(['POST', 'DELETE'])
 def admin_operation(request, option, id=0):
