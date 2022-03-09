@@ -2,7 +2,7 @@ from django import views
 from django.urls import path
 from . import views
 from django.contrib import admin
-from .views import Search
+from .views import Createbook, Search
 # from rest_framework import routers #router
 
 from rest_framework_simplejwt.views import (
@@ -26,7 +26,7 @@ urlpatterns = [
 
 # Login & Register
     #Register_A_New_User
-        path('api/register' , views.registration_view , name='register'),
+        path('api/register' , views.registration_view.as_view() , name='register'),
     # Login  
         path('api/login', TokenObtainPairView.as_view(), name='login'),
 
@@ -46,7 +46,7 @@ urlpatterns = [
        path('api/messages/' , views.messages , name='messages'),
     #Sending_Message
         path('api/message/<int:id>' , views.message , name='message'),
-        path('api/delmessage/<int:id>' , views.delmessage , name='delmessage'),
+        path('api/delmessage/<int:id>' , views.delmessage , name='message'),
 
 
 ############    
@@ -82,5 +82,7 @@ urlpatterns = [
         path('api/search' ,Search.as_view(), name = 'search'),
     #Rate
         path('api/rate/<int:id>' ,views.rate, name='rate'),
-        path('api/show_rate/<int:id>' ,views.show_rate, name='show_rate'),       
+        path('api/show_rate/<int:id>' ,views.show_rate, name='show_rate'),
+        
+        path('api/createbook/', Createbook.as_view(), name='createbook')
 ]

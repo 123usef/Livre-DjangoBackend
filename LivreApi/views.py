@@ -1,3 +1,12 @@
+# #for image 
+from rest_framework import viewsets, filters, generics, permissions
+# from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
+from rest_framework.views import APIView
+
+# ##
+
 from pickle import GET
 from unicodedata import category
 from urllib import response
@@ -44,21 +53,33 @@ def search(request):
 		return Response(seri.data)
 
 # registeration
+class registration_view(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, format=None):
+        data = request.data
+        img = request.data.get('image', 'profile/def.jpg')
+        user = User.objects.create(username=data['username'], email=data['email'],
+        gender=data['gender'], date_of_birth=data['date_of_birth'], location=data['location'], phone=data['phone'], image=img)
+        user.set_password(data['password'])
+        user.save()
+        return Response({'good'}, status=status.HTTP_200_OK)
+    
 
 
-@api_view(['POST'])
-def registration_view(request):
-    if request.method == 'POST':
-        serializer = RegistrationSerializer(data=request.data)
-        data = {}
-        if serializer.is_valid():
-            user = serializer.save()
-            data['response'] = 'successfully registered new user.'
-            data['email'] = user.email
-            data['username'] = user.username
-        else:
-            data = serializer.errors
-        return Response(data)
+# @api_view(['POST'])
+# def registration_view(request):
+#     if request.method == 'POST':
+#         serializer = RegistrationSerializer(data=request.data)
+#         data = {}
+#         if serializer.is_valid():
+#             user = serializer.save()
+#             data['response'] = 'successfully registered new user.'
+#             data['email'] = user.email
+#             data['username'] = user.username
+#         else:
+#             data = serializer.errors
+#         return Response(data)
 
 # category
 # all category
@@ -184,7 +205,24 @@ def message(request, id):
 
 # Books
 # Add_Book
+class Createbook(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser ]
+    def post(self, request, format=None):
+        user = request.user
+        data = request.data
+        img = request.data.get('image', 'book/default-book.png')
+        category = Category.objects.get(id=data['cat'])
+        book = Book.objects.create(title=data['title'], author=data['author'],
+                                description=data['description'], status=data['status'], user=user, cat=category , image=img)
+        add_book = BookSerializer(book, many=False)
 
+        
+        # serializer = BookSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        return Response(add_book.data, status=status.HTTP_200_OK)
+        
 
 @api_view(['POST'])
 def add_book(request):
