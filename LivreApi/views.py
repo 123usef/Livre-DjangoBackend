@@ -40,7 +40,7 @@ def showbook(request, id):
 def search(request):
 		q = request.GET.name
 		book = Book.objects.filter(title__contains = q )
-		seri = bookserializer(book , many=False)
+		seri = BookSerializer(book , many=False)
 		return Response(seri.data)
 
 # registeration
