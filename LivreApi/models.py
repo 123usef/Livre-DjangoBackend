@@ -25,6 +25,7 @@ class User(AbstractUser):
 #Category_Model
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
+    # cat_picture = models.ImageField(null=True, blank=True , upload_to="img/" ,default='img/Default_Image.png')
     def __str__(self):
         return self.name
 

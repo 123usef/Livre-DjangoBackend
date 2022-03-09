@@ -15,13 +15,13 @@ from rest_framework.authtoken.models import Token
 # Create your views here.
 
 # book
-@api_view()
+@api_view(['GET'])
 def showbooks(request):
     books = Book.objects.all()
     seri = BookSerializer(books, many=True)
     return Response(seri.data)
 
-@api_view()
+@api_view(['GET'])
 def showbook(request, id):
     book = Book.objects.get(id=id)
     seri = BookSerializer(book, many=False)
@@ -101,7 +101,7 @@ def profile(request):
     return Response(main_user_serializer.data)
 
 # Edit_(Logged in)Main_User_Profile
-@api_view(['POST'])
+@api_view(['GET'])
 def manage_profile(request):
     user = request.user
     update_user = MainUserSerializer(data=request.data, instance=user)
@@ -143,7 +143,7 @@ def add_book(request):
     data = request.data
     category = Category.objects.filter(name=data['cat']).first()
     book = Book.objects.create(title=data['title'], author=data['author'],
-                               description=data['description'], status=data['status'], user=user, cat=category)
+    description=data['description'], status=data['status'], user=user, cat=category)
     add_book = BookSerializer(book, many=False)
     return Response(add_book.data)
 
