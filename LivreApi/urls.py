@@ -18,9 +18,9 @@ urlpatterns = [
     path('api/category/<int:id>', views.category_view, name='category'),
     path('api/subscription/<int:id>', views.subscription_view, name='subscription'),
     path('api/unsubscription/<int:id>', views.unsubscription_view, name='unsubscription'),
-    path('api/user_subscription/<int:id>', views.user_subscription_view, name='user_subscription'),
+    path('api/user_subscription', views.user_subscription_view, name='user_subscription'),
     path('api/add_book/' , views.add_book , name='add_book'),
-
+    path('api/listcat' , views.listcat , name = 'listcat'),
 # Login & Register
     #Register_A_New_User
         path('api/register' , views.registration_view , name='register'),

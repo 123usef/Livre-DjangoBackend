@@ -67,9 +67,11 @@ class UnSubscriptionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 #usersubcribtion        
 class UserSubscriptionSerializer(serializers.ModelSerializer):
+    cat = CategorySerializer(many=False)
+    user = MainUserSerializer(many=False)
     class Meta:
         model = Subscription
-        fields =' __all__'              
+        fields =['cat' , 'user']              
 
 #messege              
 class MessageSerializer(serializers.ModelSerializer):

@@ -61,20 +61,19 @@ def category_view(request, id):
 
 # subscription
 @api_view(['GET'])
-def user_subscription_view(request, id):
+def user_subscription_view(request):
     cat = Category.objects.all()
     user = request.user
-    subsc = user.Subscription_set.all()
-    subsc_seri = UserSubscriptionSerializer(subsc, many=False, instance=user)
-    subsc_id = []
-    for subs in subsc:
-        subsc_id.append(subs.cat_id)
-    if len(subsc) == 0:
-        books = Book.object.all()
-    else:
-        books = Book.object.filter(cat_id=subsc_id)
+    subsc = user.subscription_set.all()
+    subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
     return Response(subsc_seri.data)
 
+@api_view(['GET'])
+def listcat(request):
+    user = request.user
+    catforuser = Subscription.objects.filter(user=user)
+    catser = UserSubscriptionSerializer(catforuser, many=True)
+    return Response(catser.data)
 @api_view(['GET'])
 def subscription_view(request, id):
     category = Category.objects.get(id=id)
