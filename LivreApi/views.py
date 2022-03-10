@@ -45,12 +45,12 @@ def showbook(request, id):
     book = Book.objects.get(id=id)
     seri = BookSerializer(book, many=False)
     return Response(seri.data)
-@api_view()
-def search(request):
-		q = request.GET.name
-		book = Book.objects.filter(title__contains = q )
-		seri = bookserializer(book , many=False)
-		return Response(seri.data)
+# @api_view()
+# def search(request):
+# 		q = request.GET.name
+# 		book = Book.objects.filter(title__contains = q )
+# 		seri = BookSerializer(book , many=False)
+# 		return Response(seri.data)
 
 # registeration
 class registration_view(APIView):
@@ -113,21 +113,20 @@ def category_view(request, id):
 
 
 @api_view(['GET'])
-def user_subscription_view(request, id):
+def user_subscription_view(request):
     cat = Category.objects.all()
     user = request.user
-    subsc = user.Subscription_set.all()
-    subsc_seri = UserSubscriptionSerializer(subsc, many=False, instance=user)
-    subsc_id = []
-    for subs in subsc:
-        subsc_id.append(subs.cat_id)
-    if len(subsc) == 0:
-        books = Book.object.all()
-    else:
-        books = Book.object.filter(cat_id=subsc_id)
+    subsc = user.subscription_set.all()
+    subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
     return Response(subsc_seri.data)
 
 
+@api_view(['GET'])
+def listcat(request):
+    user = request.user
+    catforuser = Subscription.objects.filter(user=user)
+    catser = UserSubscriptionSerializer(catforuser, many=True)
+    return Response(catser.data)
 @api_view(['GET'])
 def subscription_view(request, id):
     category = Category.objects.get(id=id)
@@ -358,7 +357,7 @@ def admin_listing(request, option):
         return Response(user_list.data)
     elif option == 'list_books':
         books = Book.objects.all()
-        books_list = BookSerializer(books, many=True)
+        books_list = AdminBookSerializer(books, many=True)
         return Response(books_list.data)
     elif option == 'list_category':
         cats = Category.objects.all()
@@ -389,12 +388,12 @@ def admin_operation(request, option, id=0):
             user = User.objects.get(id=id)
             user.is_blocked = 'True'
             user.save()
-            return Response(f"user with id : {id} is blocked successfully ")
+            return Response(user.is_blocked)
         elif option == "unblock_user":
             user = User.objects.get(id=id)
             user.is_blocked = 'False'
             user.save()
-            return Response(f"user with id : {id} is unblocked successfully ")
+            return Response(user.is_blocked)
         else:
             return Response("wrong parameter")
     elif request.method == "DELETE":
