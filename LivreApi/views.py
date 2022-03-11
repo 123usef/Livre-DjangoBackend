@@ -186,8 +186,14 @@ def messages(request):
     all_my_messages = MessageSerializer(messages, many=True)
     return Response(all_my_messages.data)
 
-# Sending_Message
+@api_view(['GET'])
+def sentmessages(request):
+    user = request.user
+    messages = Message.objects.filter(m_sender=user)
+    all_my_messages = MessageSerializer(messages, many=True)
+    return Response(all_my_messages.data)
 
+# Sending_Message
 @api_view(['POST'])
 def delmessage(request, id):
     message = Message.objects.get(id=id)
