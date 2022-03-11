@@ -47,6 +47,7 @@ urlpatterns = [
     #Sending_Message
         path('api/message/<int:id>' , views.message , name='message'),
         path('api/delmessage/<int:id>' , views.delmessage , name='message'),
+        path('api/sentmessages' , views.sentmessages , name='sentmessage'),
 
 
 ############    
