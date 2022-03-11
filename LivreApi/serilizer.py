@@ -4,18 +4,16 @@ from rest_framework.validators import UniqueValidator
 
 # main user
 
-
 class MainUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
 # other user
-
-
 class OtherUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username', 'email', 'gender', 'date_of_birth', 'location','phone']
+        fields = '__all__'
+        # fields = ['username','email','gender','date_of_birth','location']
 
 # register
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -80,12 +78,11 @@ class UnSubscriptionSerializer(serializers.ModelSerializer):
 
 
 class UserSubscriptionSerializer(serializers.ModelSerializer):
+    cat = CategorySerializer(many=False)
+    user = MainUserSerializer(many=False)
     class Meta:
         model = Subscription
-        fields = ' __all__'
-
-# messege
-
+        fields =['cat' , 'user']              
 
 class MessageSerializer(serializers.ModelSerializer):
     m_sender = OtherUserSerializer(many=False)
@@ -99,6 +96,11 @@ class MessageSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     cat = CategorySerializer(many=False)
     user = OtherUserSerializer(many=False)
+
+    class Meta:
+        model = Book
+        fields = '__all__'
+class AdminBookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
