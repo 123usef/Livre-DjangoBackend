@@ -1,4 +1,5 @@
 # #for image 
+import json
 from rest_framework import viewsets, filters, generics, permissions
 # from rest_framework.response import Response
 from rest_framework import status
@@ -6,7 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework.views import APIView
 
 # ##
-
+from django.db.models import Q
 from pickle import GET
 from unicodedata import category
 from urllib import response
@@ -39,12 +40,30 @@ def userbooks(request , id):
     seri = BookSerializer(books, many=True)
     return Response(seri.data)
 
+@api_view(['GET'])
+def subsbooks(request):
+    user = request.user
+    subs = Subscription.objects.filter(user=user)
+    arr = []
+    for sub in subs :
+       print(sub)
+       arr.append(sub.cat.id)
+
+    books = Book.objects.filter(cat__in=arr).order_by("cat")
+    seri = BookSerializer(books, many=True)
+    return Response(seri.data)
+
 
 @api_view()
 def showbook(request, id):
     book = Book.objects.get(id=id)
     seri = BookSerializer(book, many=False)
     return Response(seri.data)
+@api_view(['Post'])
+def delbook(request, id):
+    book = Book.objects.get(id=id)
+    book.delete()
+    return Response({'book has succefully deleted'})
 # @api_view()
 # def search(request):
 # 		q = request.GET.name
@@ -101,24 +120,25 @@ def categories(request):
     return Response(categories.data)
 
 # category page
-
-
-@api_view()
+@api_view(['GET'])
 def category_view(request, id):
     cat = Category.objects.get(id=id)
-    category = CategorySerializer(cat, many=False)
-    return Response(category.data)
+    catseri = CategorySerializer(cat, many=False)
+    books = Book.objects.filter(cat=cat)
+    booksSeri = BookSerializer(books , many=True)
+    return Response({'books':booksSeri.data , 'cat' : catseri.data})
 
 # subscription
-
-
 @api_view(['GET'])
 def user_subscription_view(request):
-    cat = Category.objects.all()
     user = request.user
-    subsc = user.subscription_set.all()
-    subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
-    return Response(subsc_seri.data)
+    subsc = Subscription.objects.filter(user=user)
+    arr = []
+    for sub in subsc:
+        arr.append(sub.cat.id)
+    myarr = json.dumps(arr)
+    # subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
+    return Response( myarr)
 
 
 @api_view(['GET'])
@@ -177,22 +197,43 @@ def others_profile(request, id):
 
 # Messages
 # View_Main_User_Messages
-
-
 @api_view(['GET'])
 def messages(request):
     user = request.user
-    messages = Message.objects.filter(m_receiver=user)
+    messages = Message.objects.filter(Q(m_receiver=user) | Q(m_sender=user) ).order_by('date_creation')
+    for message in messages :
+        message.date_creation = message.date_creation.strftime("%b %d, %Y \n %H:%M")
     all_my_messages = MessageSerializer(messages, many=True)
     return Response(all_my_messages.data)
 
 @api_view(['GET'])
 def sentmessages(request):
     user = request.user
-    messages = Message.objects.filter(m_sender=user)
+    messages = Message.objects.filter(m_sender=user).order_by('date_creation')
     all_my_messages = MessageSerializer(messages, many=True)
     return Response(all_my_messages.data)
 
+@api_view(['GET'])
+def sendusers(request):
+    user = request.user
+    Messages = Message.objects.filter(Q(m_receiver=user) | Q(m_sender=user) ).order_by('date_creation')
+    users = []
+    for message in Messages :
+         users.append({'id':message.m_receiver.id , 'username':message.m_receiver.username })
+         users.append({'id':message.m_sender.id , 'username':message.m_sender.username })
+    usersx = []
+    for i in users:
+        if i not in usersx :
+            usersx.append(i)
+        if i['id'] == request.user.id :
+            usersx.remove(i)
+    
+
+    return Response(usersx)
+    
+
+
+    
 # Sending_Message
 @api_view(['POST'])
 def delmessage(request, id):
@@ -240,8 +281,6 @@ def add_book(request):
     return Response(add_book.data)
 
 # Show_Main_User_Books
-
-
 @api_view(['GET'])
 def show_main_user_books(request):
     user = request.user
@@ -374,7 +413,6 @@ def admin_listing(request, option):
 # listing for admin ends
 # add & delete operation for admin merged in one function
 # category==> (add ,update,delete), book ==> delete book
-
 
 @api_view(['POST', 'DELETE'])
 def admin_operation(request, option, id=0):
