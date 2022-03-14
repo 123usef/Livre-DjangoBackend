@@ -79,7 +79,7 @@ class registration_view(APIView):
         data = request.data
         img = request.data.get('image', 'profile/def.jpg')
         user = User.objects.create(username=data['username'], email=data['email'],
-        gender=data['gender'], date_of_birth=data['date_of_birth'], location=data['location'], phone=data['phone'], image=img)
+        gender=data['gender'], date_of_birth=data['date_of_birth'], country=data['country'], location=data['location'], phone=data['phone'], image=img)
         user.set_password(data['password'])
         user.save()
         return Response({'good'}, status=status.HTTP_200_OK)

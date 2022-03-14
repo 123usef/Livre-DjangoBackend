@@ -24,7 +24,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'password2',
-                  'gender', 'date_of_birth', 'location', 'phone','image']
+                  'gender', 'date_of_birth', 'country', 'location', 'phone','image']
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -37,6 +37,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 username=self.validated_data['username'],
                 gender=self.validated_data['gender'],
                 date_of_birth=self.validated_data['date_of_birth'],
+                country=self.validated_data['country'],
                 location=self.validated_data['location'],
                 phone=self.validated_data['phone'],
                 image=self.validated_data['image'],
