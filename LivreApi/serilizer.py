@@ -53,31 +53,25 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return user
 
 # category
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
 # subscription
-
-
 class SubscriptionSerializer(serializers.ModelSerializer):
+    cat = CategorySerializer(many=False)
     class Meta:
         model = Subscription
         fields = '__all__'
 
 # unsubscription
-
-
 class UnSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
+
 # usersubcribtion
-
-
 class UserSubscriptionSerializer(serializers.ModelSerializer):
     cat = CategorySerializer(many=False)
     user = MainUserSerializer(many=False)

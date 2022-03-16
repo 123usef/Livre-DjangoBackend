@@ -13,7 +13,10 @@ urlpatterns = [
     path('api/books' , views.showbooks , name='books'),
     # path('api/search' , views.search , name='search'),
     path('api/books/<int:id>' , views.showbook , name='book'),
-     path('api/userbooks/<int:id>' , views.userbooks , name='userbooks'),
+    path('api/delbook/<int:id>' , views.delbook , name='delbook'),
+    path('api/userbooks/<int:id>' , views.userbooks , name='userbooks'),
+    path('api/subsbooks' , views.subsbooks , name='usersbooks'),
+
    
     #category
     path('api/categorys', views.categorys_view, name='categorys'),
@@ -48,7 +51,7 @@ urlpatterns = [
         path('api/message/<int:id>' , views.message , name='message'),
         path('api/delmessage/<int:id>' , views.delmessage , name='message'),
         path('api/sentmessages' , views.sentmessages , name='sentmessage'),
-
+        path('api/sendusers' , views.sendusers , name='sendusers'),
 
 ############    
 #Books

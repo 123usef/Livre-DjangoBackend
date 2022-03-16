@@ -60,6 +60,7 @@ class Book(models.Model):
 #Transaction_Model
 class Transaction(models.Model):
     is_accepted = models.BooleanField(default=False,null=True)
+    date_creation = models.DateTimeField(auto_now_add=True , null = True)
     book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     tr_sender = models.ForeignKey(User,related_name ="tr_sender", on_delete= models.CASCADE)
     tr_receiver = models.ForeignKey(User,related_name="tr_receiver", on_delete= models.CASCADE)
@@ -69,6 +70,7 @@ class Transaction(models.Model):
 #Message_Model
 class Message(models.Model):
     content = models.CharField(max_length=250,null= True)
+    date_creation = models.DateTimeField(auto_now_add=True , null = True)
     m_sender = models.ForeignKey(User,related_name ="m_sender", on_delete= models.CASCADE)
     m_receiver = models.ForeignKey(User,related_name="m_receiver", on_delete= models.CASCADE)    
     def __str__(self):
