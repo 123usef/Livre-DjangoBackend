@@ -71,10 +71,20 @@ def delbook(request, id):
 # 		seri = BookSerializer(book , many=False)
 # 		return Response(seri.data)
 
+# Image change
+class change_image(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    def post(self, request, format=None):
+        data = request.data
+        img = request.data.get('image', 'profile/def.jpg')
+        user = User.objects.get(id=request.user.id)
+        user.image = img
+        user.save()
+        return Response({'good'}, status=status.HTTP_200_OK)
+
 # registeration
 class registration_view(APIView):
     parser_classes = [MultiPartParser, FormParser]
-
     def post(self, request, format=None):
         data = request.data
         img = request.data.get('image', 'profile/def.jpg')
@@ -138,7 +148,7 @@ def user_subscription_view(request):
         arr.append(sub.cat.id)
     myarr = json.dumps(arr)
     # subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
-    return Response( myarr)
+    return Response(myarr)
 
 
 @api_view(['GET'])
@@ -181,14 +191,15 @@ def profile(request):
 @api_view(['POST'])
 def manage_profile(request):
     user = request.user
-    update_user = MainUserSerializer(data=request.data, instance=user)
+    print(request.data)
+    update_user = EditUserSerializer(data=request.data, instance=user) 
     if update_user.is_valid():
         update_user.save()
-    return Response(update_user.data)
+        return Response(update_user.data)
+    else:
+        return Response(update_user.errors)
 
 # Show_Other_User_Profile
-
-
 @api_view(['GET'])
 def others_profile(request, id):
     user = User.objects.get(id=id)
@@ -333,21 +344,34 @@ def decline_exchange(request, exchangeid):
     transaction.delete()
     return Response({"message": "transaction has been declined"})
 
+@api_view(['POST'])
+def finish_exchange(request, exchangeid):
+    user = request.user
+    transaction = Transaction.objects.get(id=exchangeid)
+    if user == transaction.user.tr_sender:
+        transaction.sender_finished = True
+        transaction.save()
+    elif user == transaction.user.tr_receiver:
+        transaction.receiver_finished = True
+        transaction.save()
+    return Response({"message": "transaction has been finished"})
+
+
 # View_Main_User_Sent_Transactions
 
 
 @api_view(['GET'])
 def show_sender_transaction(request):
     user = request.user
-    transaction = Transaction.objects.filter(tr_sender=user)
-    show_sender_transaction = TransactionSerializer(transaction, many=True)
+    transaction = Transaction.objects.filter(tr_sender=user ,sender_finished = False )
+    show_sender_transaction = TransactionSerializer(transaction, many=True) 
     return Response(show_sender_transaction.data)
 
 # View_Main_User_Recived_Transactions
 @api_view(['GET'])
 def show_reciver_transaction(request):
     user = request.user
-    transaction = Transaction.objects.filter(tr_receiver=user)
+    transaction = Transaction.objects.filter(tr_receiver=user ,receiver_finished = False)
     show_reciver_transaction = TransactionSerializer(transaction, many=True)
     return Response(show_reciver_transaction.data)
 

@@ -38,9 +38,11 @@ urlpatterns = [
     #Show_(Logged in)Main_User_Profile
         path('api/profile/' , views.profile , name='profile'),
     #Edit_(Logged in)Main_User_Profile
-        path('api/manage_profile/' , views.manage_profile , name='manage_profile'),      
+        path('api/manage_profile' , views.manage_profile , name='manage_profile'),      
     #Show_Other_User_Profile
         path('api/others_profile/<int:id>' , views.others_profile , name='others_profile'),
+    #Change_image
+        path('api/changeimage' , views.change_image.as_view() , name='change_image'),
 
 
 ############   
@@ -77,7 +79,8 @@ urlpatterns = [
         path('api/user_sender_transaction/' , views.show_sender_transaction , name='show_sender_transaction'),
     #Show_Main_User_Recived_Transactions
         path('api/user_reciver_transaction/' , views.show_reciver_transaction , name='show_reciver_transaction'),
-
+    #finish_exchange
+        path('api/finishexchange/' , views.finish_exchange , name='finis_transaction'),
     #admin urls
         path('api/admin_listing/<str:option>' ,views.admin_listing , name='admin_listing'),
         path('api/admin_operation/<str:option>' ,views.admin_operation , name='admin_operation'),
