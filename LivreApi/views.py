@@ -5,6 +5,7 @@ from rest_framework import viewsets, filters, generics, permissions
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework.views import APIView
+import json
 
 # ##
 from django.db.models import Q
@@ -137,7 +138,6 @@ def category_view(request, id):
     books = Book.objects.filter(cat=cat)
     booksSeri = BookSerializer(books , many=True)
     return Response({'books':booksSeri.data , 'cat' : catseri.data})
-
 # subscription
 @api_view(['GET'])
 def user_subscription_view(request):

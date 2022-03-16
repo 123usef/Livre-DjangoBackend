@@ -55,7 +55,6 @@ urlpatterns = [
         path('api/sentmessages' , views.sentmessages , name='sentmessage'),
         path('api/sendusers' , views.sendusers , name='sendusers'),
 
-
 ############    
 #Books
     #Add_Book
