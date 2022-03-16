@@ -4,6 +4,7 @@ from rest_framework import viewsets, filters, generics, permissions
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework.views import APIView
+import json
 
 # ##
 
@@ -106,20 +107,23 @@ def categories(request):
 @api_view()
 def category_view(request, id):
     cat = Category.objects.get(id=id)
-    category = CategorySerializer(cat, many=False)
-    return Response(category.data)
-
+    catseri = CategorySerializer(cat, many=False)
+    books = Book.objects.filter(cat=cat)
+    booksSeri = BookSerializer(books , many=True)
+    return Response({'books':booksSeri.data , 'cat' : catseri.data})
 # subscription
 
 
 @api_view(['GET'])
 def user_subscription_view(request):
-    cat = Category.objects.all()
     user = request.user
-    subsc = user.subscription_set.all()
-    subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
-    return Response(subsc_seri.data)
-
+    subsc = Subscription.objects.filter(user=user)
+    arr = []
+    for sub in subsc:
+        arr.append(sub.cat.id)
+    myarr = json.dumps(arr)
+    # subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
+    return Response(myarr)
 
 @api_view(['GET'])
 def listcat(request):
