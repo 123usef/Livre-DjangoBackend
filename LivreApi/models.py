@@ -60,6 +60,8 @@ class Book(models.Model):
 #Transaction_Model
 class Transaction(models.Model):
     is_accepted = models.BooleanField(default=False,null=True)
+    sender_finished = models.BooleanField(default=False,null=True)
+    receiver_finished = models.BooleanField(default=False,null=True)
     date_creation = models.DateTimeField(auto_now_add=True , null = True)
     book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     tr_sender = models.ForeignKey(User,related_name ="tr_sender", on_delete= models.CASCADE)

@@ -1,10 +1,12 @@
 # #for image 
+from email.mime import image
 import json
 from rest_framework import viewsets, filters, generics, permissions
 # from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework.views import APIView
+import json
 
 # ##
 from django.db.models import Q
@@ -24,9 +26,26 @@ from rest_framework import generics
 from rest_framework.authtoken.models import Token
 # Create your views here.
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.username
+        token['is_admin'] = user.is_admin
+        # ...
+
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
 # book
-
-
 @api_view()
 def showbooks(request):
     books = Book.objects.all().order_by("-id")
@@ -71,10 +90,20 @@ def delbook(request, id):
 # 		seri = BookSerializer(book , many=False)
 # 		return Response(seri.data)
 
+# Image change
+class change_image(APIView):
+    parser_classes = [MultiPartParser, FormParser]
+    def post(self, request, format=None):
+        data = request.data
+        img = request.data.get('image', 'profile/def.jpg')
+        user = User.objects.get(id=request.user.id)
+        user.image = img
+        user.save()
+        return Response({'good'}, status=status.HTTP_200_OK)
+
 # registeration
 class registration_view(APIView):
     parser_classes = [MultiPartParser, FormParser]
-
     def post(self, request, format=None):
         data = request.data
         img = request.data.get('image', 'profile/def.jpg')
@@ -127,7 +156,6 @@ def category_view(request, id):
     books = Book.objects.filter(cat=cat)
     booksSeri = BookSerializer(books , many=True)
     return Response({'books':booksSeri.data , 'cat' : catseri.data})
-
 # subscription
 @api_view(['GET'])
 def user_subscription_view(request):
@@ -138,7 +166,7 @@ def user_subscription_view(request):
         arr.append(sub.cat.id)
     myarr = json.dumps(arr)
     # subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
-    return Response( myarr)
+    return Response(myarr)
 
 
 @api_view(['GET'])
@@ -181,14 +209,15 @@ def profile(request):
 @api_view(['POST'])
 def manage_profile(request):
     user = request.user
-    update_user = MainUserSerializer(data=request.data, instance=user)
+    print(request.data)
+    update_user = EditUserSerializer(data=request.data, instance=user) 
     if update_user.is_valid():
         update_user.save()
-    return Response(update_user.data)
+        return Response(update_user.data)
+    else:
+        return Response(update_user.errors)
 
 # Show_Other_User_Profile
-
-
 @api_view(['GET'])
 def others_profile(request, id):
     user = User.objects.get(id=id)
@@ -333,21 +362,32 @@ def decline_exchange(request, exchangeid):
     transaction.delete()
     return Response({"message": "transaction has been declined"})
 
+@api_view(['POST'])
+def finish_exchange(request, exchangeid):
+    user = request.user
+    transaction = Transaction.objects.get(id=exchangeid)
+    if user == transaction.tr_sender:
+        transaction.sender_finished = True
+        transaction.save()
+    elif user == transaction.tr_receiver:
+        transaction.receiver_finished = True
+        transaction.save()
+    return Response({"message": "transaction has been finished"})
+
+
 # View_Main_User_Sent_Transactions
-
-
 @api_view(['GET'])
 def show_sender_transaction(request):
     user = request.user
-    transaction = Transaction.objects.filter(tr_sender=user)
-    show_sender_transaction = TransactionSerializer(transaction, many=True)
+    transaction = Transaction.objects.filter(tr_sender=user ,sender_finished = False )
+    show_sender_transaction = TransactionSerializer(transaction, many=True) 
     return Response(show_sender_transaction.data)
 
 # View_Main_User_Recived_Transactions
 @api_view(['GET'])
 def show_reciver_transaction(request):
     user = request.user
-    transaction = Transaction.objects.filter(tr_receiver=user)
+    transaction = Transaction.objects.filter(tr_receiver=user ,receiver_finished = False)
     show_reciver_transaction = TransactionSerializer(transaction, many=True)
     return Response(show_reciver_transaction.data)
 
@@ -413,6 +453,23 @@ def admin_listing(request, option):
 # listing for admin ends
 # add & delete operation for admin merged in one function
 # category==> (add ,update,delete), book ==> delete book
+
+class Createcat(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser ]
+    def post(self, request, format=None):
+        user = request.user
+        data = request.data
+        img = request.data.get('image', 'book/default-book.png')
+        cat = Category.objects.create(name=data['name'] , image=img)
+
+        cat_ser = CategorySerializer(cat, many=False)
+
+        
+        # serializer = BookSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        return Response(cat_ser.data, status=status.HTTP_200_OK)
 
 @api_view(['POST', 'DELETE'])
 def admin_operation(request, option, id=0):
