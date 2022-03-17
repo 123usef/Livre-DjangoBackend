@@ -24,7 +24,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email', 'username', 'password', 'password2',
-                  'gender', 'date_of_birth', 'location', 'phone','image']
+                  'gender', 'date_of_birth', 'country', 'location', 'phone','image']
         extra_kwargs = {
             'password': {'write_only': True},
         }
@@ -37,6 +37,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 username=self.validated_data['username'],
                 gender=self.validated_data['gender'],
                 date_of_birth=self.validated_data['date_of_birth'],
+                country=self.validated_data['country'],
                 location=self.validated_data['location'],
                 phone=self.validated_data['phone'],
                 image=self.validated_data['image'],
@@ -52,31 +53,25 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return user
 
 # category
-
-
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
 
 # subscription
-
-
 class SubscriptionSerializer(serializers.ModelSerializer):
+    cat = CategorySerializer(many=False)
     class Meta:
         model = Subscription
         fields = '__all__'
 
 # unsubscription
-
-
 class UnSubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = '__all__'
+
 # usersubcribtion
-
-
 class UserSubscriptionSerializer(serializers.ModelSerializer):
     cat = CategorySerializer(many=False)
     user = MainUserSerializer(many=False)

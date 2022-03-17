@@ -14,9 +14,10 @@ class User(AbstractUser):
     is_blocked = models.BooleanField(default=False , null = True)
     is_admin = models.BooleanField(default=False , null = True)
     image = models.ImageField(upload_to=upload_toprofile , default='profile/def.jpg' )
-    user_gender = (("male", "male"), ("female", "female"))
+    user_gender = (("Male", "Male"), ("Female", "Female"))
     gender = models.CharField(max_length= 6, choices=user_gender,null = True)
     date_of_birth = models.DateField(null = True)
+    country = models.CharField(max_length = 200,null = True)
     location = models.CharField(max_length = 200,null = True)
     phone = models.CharField(max_length = 20,null = True)
     email = models.EmailField(verbose_name = 'email',max_length=50, unique=True)
@@ -30,6 +31,7 @@ class User(AbstractUser):
 #Category_Model
 class Category(models.Model):
     name = models.CharField(max_length=50,null=True) 
+    image = models.ImageField(upload_to=upload_to, null=True , default='book/default-book.png')
     # cat_picture = models.ImageField(null=True, blank=True , upload_to="img/" ,default='img/Default_Image.png')
     def __str__(self):
         return self.name
@@ -39,7 +41,7 @@ class Subscription(models.Model):
     cat = models.ForeignKey(Category, on_delete= models.CASCADE)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     def __str__(self):
-        return self.cat
+        return self.cat.name
 
 #Book_Model
 class Book(models.Model):
@@ -47,7 +49,7 @@ class Book(models.Model):
     author=models.CharField(max_length=50,null=True )
     image = models.ImageField(upload_to=upload_to, null=True , default='book/default-book.png')
     description = models.TextField(null=True)
-    book_status = (("exchange", "exchange"), ("donate", "donate"))
+    book_status = (("Exchange", "Exchange"), ("Donate", "Donate"))
     status = models.CharField(max_length= 20, choices=book_status,null = True)
     date_creation = models.DateTimeField(auto_now_add=True , null = True)
     user = models.ForeignKey(User, on_delete= models.CASCADE)
@@ -58,6 +60,7 @@ class Book(models.Model):
 #Transaction_Model
 class Transaction(models.Model):
     is_accepted = models.BooleanField(default=False,null=True)
+    date_creation = models.DateTimeField(auto_now_add=True , null = True)
     book = models.ForeignKey(Book,on_delete=models.CASCADE,null=True)
     tr_sender = models.ForeignKey(User,related_name ="tr_sender", on_delete= models.CASCADE)
     tr_receiver = models.ForeignKey(User,related_name="tr_receiver", on_delete= models.CASCADE)
@@ -67,6 +70,7 @@ class Transaction(models.Model):
 #Message_Model
 class Message(models.Model):
     content = models.CharField(max_length=250,null= True)
+    date_creation = models.DateTimeField(auto_now_add=True , null = True)
     m_sender = models.ForeignKey(User,related_name ="m_sender", on_delete= models.CASCADE)
     m_receiver = models.ForeignKey(User,related_name="m_receiver", on_delete= models.CASCADE)    
     def __str__(self):
