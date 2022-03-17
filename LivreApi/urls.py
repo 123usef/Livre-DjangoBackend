@@ -2,12 +2,9 @@ from django import views
 from django.urls import path
 from . import views
 from django.contrib import admin
-from .views import Createbook, Search
+from .views import Createbook, Createcat, MyTokenObtainPairView, Search
 # from rest_framework import routers #router
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-)
 urlpatterns = [
 
     path('api/books' , views.showbooks , name='books'),
@@ -31,7 +28,7 @@ urlpatterns = [
     #Register_A_New_User
         path('api/register' , views.registration_view.as_view() , name='register'),
     # Login  
-        path('api/login', TokenObtainPairView.as_view(), name='login'),
+        path('api/login', MyTokenObtainPairView.as_view(), name='login'),
 
 ############
 # User Profile
@@ -79,12 +76,14 @@ urlpatterns = [
     #Show_Main_User_Recived_Transactions
         path('api/user_reciver_transaction/' , views.show_reciver_transaction , name='show_reciver_transaction'),
     #finish_exchange
-        path('api/finishexchange/' , views.finish_exchange , name='finis_transaction'),
+        path('api/finishexchange/<int:exchangeid>' , views.finish_exchange , name='finis_transaction'),
     #admin urls
         path('api/admin_listing/<str:option>' ,views.admin_listing , name='admin_listing'),
         path('api/admin_operation/<str:option>' ,views.admin_operation , name='admin_operation'),
         path('api/admin_operation/<str:option>/<int:id>' ,views.admin_operation , name='admin_operation'),
 
+        path('api/createcat/', Createcat.as_view(), name='createcat'),
+        
     #Search
         path('api/search' ,Search.as_view(), name = 'search'),
     #Rate

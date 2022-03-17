@@ -1,4 +1,5 @@
 # #for image 
+from email.mime import image
 import json
 from rest_framework import viewsets, filters, generics, permissions
 # from rest_framework.response import Response
@@ -25,9 +26,26 @@ from rest_framework import generics
 from rest_framework.authtoken.models import Token
 # Create your views here.
 
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.username
+        token['is_admin'] = user.is_admin
+        # ...
+
+        return token
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
+
 # book
-
-
 @api_view()
 def showbooks(request):
     books = Book.objects.all().order_by("-id")
@@ -348,18 +366,16 @@ def decline_exchange(request, exchangeid):
 def finish_exchange(request, exchangeid):
     user = request.user
     transaction = Transaction.objects.get(id=exchangeid)
-    if user == transaction.user.tr_sender:
+    if user == transaction.tr_sender:
         transaction.sender_finished = True
         transaction.save()
-    elif user == transaction.user.tr_receiver:
+    elif user == transaction.tr_receiver:
         transaction.receiver_finished = True
         transaction.save()
     return Response({"message": "transaction has been finished"})
 
 
 # View_Main_User_Sent_Transactions
-
-
 @api_view(['GET'])
 def show_sender_transaction(request):
     user = request.user
@@ -437,6 +453,23 @@ def admin_listing(request, option):
 # listing for admin ends
 # add & delete operation for admin merged in one function
 # category==> (add ,update,delete), book ==> delete book
+
+class Createcat(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser ]
+    def post(self, request, format=None):
+        user = request.user
+        data = request.data
+        img = request.data.get('image', 'book/default-book.png')
+        cat = Category.objects.create(name=data['name'] , image=img)
+
+        cat_ser = CategorySerializer(cat, many=False)
+
+        
+        # serializer = BookSerializer(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        return Response(cat_ser.data, status=status.HTTP_200_OK)
 
 @api_view(['POST', 'DELETE'])
 def admin_operation(request, option, id=0):
