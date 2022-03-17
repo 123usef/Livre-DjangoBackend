@@ -9,8 +9,7 @@ def upload_toprofile(instance, filename):
 
 
 #User_Model
-class User(AbstractUser):
-   
+class User(AbstractUser):   
     is_blocked = models.BooleanField(default=False , null = True)
     is_admin = models.BooleanField(default=False , null = True)
     image = models.ImageField(upload_to=upload_toprofile , default='profile/def.jpg' )

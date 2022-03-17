@@ -48,10 +48,32 @@ class MyTokenObtainPairView(TokenObtainPairView):
 # book
 @api_view()
 def showbooks(request):
-    books = Book.objects.all().order_by("-id")
-    seri = BookSerializer(books, many=True)
-    return Response(seri.data)
-
+    if request.user: 
+        user = request.user
+        subs = Subscription.objects.filter(user=user)
+        if not subs :
+          books = Book.objects.all()
+          booksseri = BookSerializer(books , many=True)
+          return Response(booksseri.data)
+        arr = []
+        for sub in subs :
+            print(sub)
+        
+        arr.append(sub.cat.id)
+        subbooks = Book.objects.filter(cat__in=arr).order_by("cat")
+        books = Book.objects.all()
+        mybooks = []
+        for book in subbooks :
+            mybooks.append(book)
+        for book in books:
+            if book not in mybooks:
+                mybooks.append(book)
+        booksseri = BookSerializer(mybooks , many=True)
+        return Response(booksseri.data)
+    # myset = set(mybooks)
+    books = Book.objects.all()
+    booksseri = BookSerializer(books , many=True)
+    return Response(booksseri.data)
 @api_view(['GET'])
 def userbooks(request , id):
     user = User.objects.get(id=id)
@@ -61,16 +83,27 @@ def userbooks(request , id):
 
 @api_view(['GET'])
 def subsbooks(request):
-    user = request.user
-    subs = Subscription.objects.filter(user=user)
-    arr = []
-    for sub in subs :
-       print(sub)
-       arr.append(sub.cat.id)
-
-    books = Book.objects.filter(cat__in=arr).order_by("cat")
-    seri = BookSerializer(books, many=True)
-    return Response(seri.data)
+    if request.user: 
+        user = request.user
+        subs = Subscription.objects.filter(user=user)
+        arr = []
+        for sub in subs :
+            print(sub)
+        arr.append(sub.cat.id)
+        subbooks = Book.objects.filter(cat__in=arr).order_by("cat")
+        books = Book.objects.all()
+        mybooks = []
+        for book in subbooks :
+            mybooks.append(book)
+        for book in books:
+            if book not in mybooks:
+                mybooks.append(book)
+        booksseri = BookSerializer(mybooks , many=True)
+        return Response(booksseri.data)
+    # myset = set(mybooks)
+    books = Book.objects.all()
+    booksseri = BookSerializer(books , many=True)
+    return Response(booksseri.data)
 
 
 @api_view()
@@ -423,7 +456,7 @@ class Search(generics.ListAPIView):
     serializer_class = BookSerializer
     filter_backends = [filters.SearchFilter, OrderingFilter]
     search_fields = ['title', 'author', 'status',
-                     'description', 'cat__name', 'user__location']
+                     'cat__name', 'user__location']
 
 # admin section starts from here
 # --------------------------------
