@@ -1,4 +1,5 @@
 # #for image 
+from ast import Str
 from email.mime import image
 import json
 from rest_framework import viewsets, filters, generics, permissions
@@ -48,7 +49,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 # book
 @api_view()
 def showbooks(request):
-    if request.user: 
+    if request.user.id: 
         user = request.user
         subs = Subscription.objects.filter(user=user)
         if not subs :
@@ -58,8 +59,7 @@ def showbooks(request):
         arr = []
         for sub in subs :
             print(sub)
-        
-        arr.append(sub.cat.id)
+            arr.append(sub.cat.id)
         subbooks = Book.objects.filter(cat__in=arr).order_by("cat")
         books = Book.objects.all()
         mybooks = []
@@ -70,10 +70,11 @@ def showbooks(request):
                 mybooks.append(book)
         booksseri = BookSerializer(mybooks , many=True)
         return Response(booksseri.data)
-    # myset = set(mybooks)
+    # else:
     books = Book.objects.all()
     booksseri = BookSerializer(books , many=True)
     return Response(booksseri.data)
+
 @api_view(['GET'])
 def userbooks(request , id):
     user = User.objects.get(id=id)
@@ -197,9 +198,10 @@ def user_subscription_view(request):
     arr = []
     for sub in subsc:
         arr.append(sub.cat.id)
-    myarr = json.dumps(arr)
-    # subsc_seri = UserSubscriptionSerializer(subsc, many=True)    
-    return Response(myarr)
+    # myarr = json.dumps(arr)
+    # subsc_seri = UserSubscriptionSerializer(subsc, many=True)
+        
+    return Response(arr)
 
 
 @api_view(['GET'])
@@ -221,8 +223,8 @@ def subscription_view(request, id):
 def unsubscription_view(request, id):
     user = request.user
     category = Category.objects.get(id=id)
-    subscribe = Subscription.objects.filter(
-        user=request.user, cat=category).first()
+    subscribe = Subscription.objects.get(
+        user=request.user, cat=category)
     subscribe.delete()
     return Response({"message": "you unsubscribed this category now"})
 
@@ -281,8 +283,8 @@ def sendusers(request):
     Messages = Message.objects.filter(Q(m_receiver=user) | Q(m_sender=user) ).order_by('date_creation')
     users = []
     for message in Messages :
-         users.append({'id':message.m_receiver.id , 'username':message.m_receiver.username })
-         users.append({'id':message.m_sender.id , 'username':message.m_sender.username })
+         users.append({'id':message.m_receiver.id , 'username':message.m_receiver.username , 'img':"/media/"+str(message.m_receiver.image)})
+         users.append({'id':message.m_sender.id , 'username':message.m_sender.username , 'img':"/media/"+str(message.m_sender.image)})
     usersx = []
     for i in users:
         if i not in usersx :
