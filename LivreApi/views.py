@@ -117,12 +117,7 @@ def delbook(request, id):
     book = Book.objects.get(id=id)
     book.delete()
     return Response({'book has succefully deleted'})
-# @api_view()
-# def search(request):
-# 		q = request.GET.name
-# 		book = Book.objects.filter(title__contains = q )
-# 		seri = BookSerializer(book , many=False)
-# 		return Response(seri.data)
+
 
 # Image change
 class change_image(APIView):
